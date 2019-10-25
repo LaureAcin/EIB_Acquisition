@@ -25,6 +25,12 @@
 			<artifactId>xbee-api</artifactId>
 			<version>0.9.3</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.zenjava/javafx-maven-plugin -->
+		 <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>12.0.1</version>
+    </dependency>
 
 	</dependencies>
 </project>
