@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -20,59 +21,49 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
+import model.EIBSample;
+import model.EibListener;
 import model.MaCentrale;
 
-public class EMGLauncher extends Application {
+public class EMGLauncher extends Application implements EibListener {
+
+	private static final String PORT_COM = "COM3";
+	private EMGMainFrame emgGraph;
+	private MaCentrale maCentrale;
 
 	public static void main(String[] args) {
+
 		Application.launch(EMGLauncher.class, args);
-//		new EMGLauncher();
+		// new EMGLauncher("COM3");
 	}
 
 	public EMGLauncher() {
 
-		MaCentrale maCentrale = new MaCentrale();
-		
-
 		
 //		Application.launch("EMGMainFrame");
 //		emgGraph.addValue(2,3);
-		/*
-		 * // TODO Auto-generated method stub XBee xBee = new XBee();
-		 * //System.out.println("Hello Xbee"); try { xBee.open("COM3", 9600); } catch
-		 * (XBeeException e) { System.out.println("Erreur de connection au port");
-		 * e.printStackTrace(); }
-		 * 
-		 * 
-		 * xBee.addPacketListener(new PacketListener() {
-		 * 
-		 * @Override public void processResponse(XBeeResponse response) {
-		 * System.out.println(response.getApiId());
-		 * 
-		 * // TODO Auto-generated method stub if (response.getApiId() ==
-		 * ApiId.RX_16_IO_RESPONSE) { RxResponseIoSample rxResponseIoSample =
-		 * (RxResponseIoSample) response;
-		 * 
-		 * for (IoSample sample: rxResponseIoSample.getSamples()) {
-		 * System.out.println("Analog D0 (pin 20) 10-bit reading is " +
-		 * sample.getAnalog0()); System.out.println("Digital D4 (pin 11) is " +
-		 * (sample.isD4On() ? "on" : "off")); } // Integer analog0Value =
-		 * rxResponseIoSample.getSamples()[0].getAnalog0(); //
-		 * System.out.println("PIN 0=" + analog0Value);
-		 * 
-		 * }
-		 * 
-		 * } });
-		 */
 
 	}
 
 	@Override
 	public void start(Stage stage) {
-		EMGMainFrame emgGraph = new  EMGMainFrame(stage);
-		emgGraph.addValue(2, 10);
-		emgGraph.addValue(20, 100);
+		emgGraph = new EMGMainFrame(stage);
 
+		maCentrale = new MaCentrale(PORT_COM);
+		maCentrale.addEibListener(this);
+		maCentrale.getBuffer();
+
+		/*
+		 * //Pre-determined test values emgGraph.addValue(2, 10); emgGraph.addValue(20,
+		 * 100);
+		 */
+
+	}
+
+	@Override
+	public void onSampleReceived(EIBSample eibSample) {
+		emgGraph.addValue(eibSample.getDate().getSeconds(), eibSample.getSampleValue());
+		emgGraph.refreshGraph();
 	}
 
 }

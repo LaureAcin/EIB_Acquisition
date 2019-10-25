@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import com.rapplogic.xbee.api.ApiId;
 import com.rapplogic.xbee.api.PacketListener;
 import com.rapplogic.xbee.api.XBee;
@@ -10,22 +13,28 @@ import com.rapplogic.xbee.api.wpan.RxResponseIoSample;
 
 public class MaCentrale {
 	
-	private String analogResponse;
+	private ArrayList<EIBSample> realTimeBuffer;
+	private float analogResponse;
+	private String portUSB;
+	private EibListener listener;
 	
-	public MaCentrale() {
-		int i = 0;
-		analogResponse = Integer.toString(i);
+	public MaCentrale(String portUsb) {
+		float responseValue = 0;
+		analogResponse = responseValue;
+		portUSB = portUsb;
+		realTimeBuffer = new ArrayList<EIBSample>();
+		initializeZigbeeNetwork();
+		
 	}
 	
-	public void setResponse(int i) {
+	private void initializeZigbeeNetwork() {
 		
-		// TODO Auto-generated method stub
 		XBee xBee = new XBee();
 		//System.out.println("Hello Xbee");
 		try {
-			xBee.open("COM3", 9600);
+			xBee.open(portUSB, 9600);
 		} catch (XBeeException e) {
-			System.out.println("Erreur de connection au port");
+			System.out.println("Erreur de connexion au port");
 			e.printStackTrace();
 		}
 		
@@ -34,23 +43,38 @@ public class MaCentrale {
 
 			@Override
 			public void processResponse(XBeeResponse response) {
-				System.out.println(response.getApiId());
+				//System.out.println(response.getApiId());
 
-				// TODO Auto-generated method stub
 				if (response.getApiId() == ApiId.RX_16_IO_RESPONSE) {	
 					RxResponseIoSample rxResponseIoSample = (RxResponseIoSample) response;
 					
 					for (IoSample sample: rxResponseIoSample.getSamples()) {
-						analogResponse = Integer.toString(sample.getAnalog0());
+						analogResponse = sample.getAnalog0();
+						System.out.println(analogResponse);
+						EIBSample eibSample = new EIBSample(analogResponse, new Date());
+						listener.onSampleReceived(eibSample);
+						realTimeBuffer.add(eibSample);
+						
+						/*
 						System.out.println("Analog D0 (pin 20) 10-bit reading is " + sample.getAnalog0());
 						System.out.println("Digital D4 (pin 11) is " + (sample.isD4On() ? "on" : "off"));
+						*/
 					}
 				}
 			}
 		});
 	}
 	
-	public String getResponse() {
-		return analogResponse;
+	public ArrayList<EIBSample> getBuffer() {
+		return realTimeBuffer;
+	}
+	
+	public void clearBuffer() {
+		realTimeBuffer.clear();
+	}
+
+	public void addEibListener(EibListener listener) {
+		this.listener = listener;
+		
 	}
 }
