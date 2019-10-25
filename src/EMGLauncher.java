@@ -34,7 +34,7 @@ public class EMGLauncher extends Application {
 		MaCentrale maCentrale = new MaCentrale();
 		
 
-//		EMGMainFrame emgGraph = new  EMGMainFrame();
+		
 //		Application.launch("EMGMainFrame");
 //		emgGraph.addValue(2,3);
 		/*
@@ -69,30 +69,10 @@ public class EMGLauncher extends Application {
 
 	@Override
 	public void start(Stage stage) {
-		// TODO Auto-generated method stub
-        stage.setTitle("Graphique EMG");
-        //defining the axes
-        final NumberAxis xAxis = new NumberAxis();
-        final NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Temps");
-        //creating the chart
-        final LineChart<Number,Number> lineChart = 
-                new LineChart<Number,Number>(xAxis,yAxis);
-                
-        lineChart.setTitle("Graphe EMG");
-        //defining a series
-        XYChart.Series series = new XYChart.Series();
-        series.setName("Amplitude du signal EMG");
-        //populating the series with data
-        /*series.getData().add(new XYChart.Data(1, 23));
-        series.getData().add(new XYChart.Data(2, 14));
-        */
-        
-        Scene scene  = new Scene(lineChart,800,600);
-        lineChart.getData().add(series);
-       
-        stage.setScene(scene);
-        stage.show();		
+		EMGMainFrame emgGraph = new  EMGMainFrame(stage);
+		emgGraph.addValue(2, 10);
+		emgGraph.addValue(20, 100);
+
 	}
 
 }
